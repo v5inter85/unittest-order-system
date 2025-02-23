@@ -27,6 +27,22 @@ func TestIsNoRows(t *testing.T) {
 			err:      errors.New("some other error"),
 			expected: false,
 		},
+		{
+			name: "database error with sql.ErrNoRows",
+			err: &Error{
+				Operation: "query",
+				Err:       sql.ErrNoRows,
+			},
+			expected: true,
+		},
+		{
+			name: "database error with other error",
+			err: &Error{
+				Operation: "query",
+				Err:       errors.New("some other error"),
+			},
+			expected: false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -53,6 +69,22 @@ func TestIsDuplicate(t *testing.T) {
 		{
 			name:     "non-database error",
 			err:      errors.New("some other error"),
+			expected: false,
+		},
+		{
+			name: "duplicate key error",
+			err: &Error{
+				Operation: "insert",
+				Err:      errors.New("1062: Duplicate entry"),
+			},
+			expected: true,
+		},
+		{
+			name: "other database error",
+			err: &Error{
+				Operation: "insert",
+				Err:      errors.New("1064: Syntax error"),
+			},
 			expected: false,
 		},
 	}
